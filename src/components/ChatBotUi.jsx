@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import star from "../assets/star.png";
-import sendIcon from "../assets/send.png";
+import { SendIcon } from "./icons/SendIcon";
 
 export const ChatBotUi = () => {
   const [inputValue, setInputValue] = useState("");
@@ -18,71 +18,88 @@ export const ChatBotUi = () => {
   };
 
   return (
-<div className="relative w-full h-full min-h-screen bg-white overflow-hidden">
-      {/* Arka plan ışık efektleri */}
-      <div className="absolute top-[483px] left-1/2 -translate-x-1/2 w-[412px] h-[464px]">
-        <div className="absolute top-0 left-[calc(50%-6px)] w-[212px] h-[280px] bg-[#89bcff] rounded-[140px] blur-[150px]" />
-        <div className="absolute top-[50px] left-[calc(50%-206px)] w-[313px] h-[414px] bg-[#ff86e1] rounded-[207px] blur-[250px]" />
-      </div>
-
-      {/* Header */}
-      <header className="absolute flex flex-col items-center w-[310px] gap-12 top-[calc(50%-270px)] left-[calc(50%-155px)]">
-        <div className="flex justify-center items-center">
-  <img
-    src={star}
-    alt="Star"
-    className="w-8 h-8 object-contain opacity-90"
-  />
-</div>
-
-        <h1 className="text-[#160211] text-2xl text-center">
+    <div
+      className="
+        w-full h-full 
+        flex flex-col 
+        items-center 
+        justify-between 
+        px-4 py-10
+      "
+    >
+      {/* ÜST KISIM */}
+      <div className="flex flex-col items-center gap-4 mt-10">
+        <img src={star} alt="star" className="w-10 h-10 opacity-80" />
+        <h1 className="text-xl font-medium text-gray-800">
           Ask our AI anything
         </h1>
-      </header>
+      </div>
 
-      {/* Öneriler */}
-     <section className="absolute top-[622px] left-1/2 -translate-x-1/2 w-[667px]">
-        <h2 className="mb-6 text-sm font-bold text-[#56637e]">
-          Suggestions on what to ask Our AI
+      {/* ÖNERİLER (ORTADA COLUMN) */}
+      <div className="flex flex-col items-center gap-6 grow justify-center">
+        <h2 className="text-sm font-medium text-gray-600">
+          Suggestions on what to ask
         </h2>
 
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-3 items-center">
           {suggestions.map((txt, i) => (
             <button
               key={i}
               onClick={() => setInputValue(txt)}
-              className={`${
-                i === 0 ? "w-[283px]" : "w-[376px]"
-              } h-[49px] flex items-center justify-center bg-white/50 border border-white rounded-lg p-2.5 hover:bg-white/70 transition`}
-              type="button"
+              className="
+                w-[260px] h-12
+                flex items-center justify-center
+                bg-white/40 
+                backdrop-blur-xl
+                border border-white/50
+                rounded-2xl
+                shadow-md shadow-black/5
+                text-gray-800
+                hover:bg-white/60
+                transition
+              "
             >
-              <span className="text-sm text-[#160211] text-left">{txt}</span>
+              {txt}
             </button>
           ))}
         </div>
-      </section>
+      </div>
 
-      {/* Input alanı */}
+      {/* ALT INPUT BAR */}
       <form
         onSubmit={handleSubmit}
-        className="absolute top-[721px] left-1/2 -translate-x-1/2 w-[668px]"
+        className="w-full max-w-[620px] px-2"
       >
-        <div className="flex items-center justify-between p-2.5 bg-white border border-[#1602114c] rounded-lg">
+        <div
+          className="
+            w-full 
+            bg-white/60 
+            backdrop-blur-xl 
+            border border-white/50 
+            rounded-2xl 
+            shadow-md shadow-black/5 
+            flex items-center 
+            p-3
+          "
+        >
           <input
             type="text"
+            className="
+              flex-1 bg-transparent
+              text-gray-800
+              placeholder-gray-500
+              text-sm
+              outline-none
+              pr-3
+            "
+            placeholder="Ask me anything..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Ask me anything about your projects"
-            className="w-full text-sm text-[#160211] placeholder-[#56637e] focus:outline-none mr-3"
           />
 
-          <button type="submit">
-            <img
-              src={sendIcon}
-              alt="Send"
-              className="w-9 h-9 object-contain"
-            />
-          </button>
+          <button type="submit" className="p-2 rounded-xl hover:bg-white/40 transition">
+  <SendIcon className="w-6 h-6 text-gray-700 opacity-80 hover:opacity-100" />
+</button>
         </div>
       </form>
     </div>
