@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import star from "../assets/star.png";
-import { SendIcon } from "./icons/SendIcon";
+
+import { SendButton } from "./ui/SendButton";
+import { InputBar } from "./ui/InputBar";
+import { SectionTitle } from "./ui/SectionTitle";
+import { SuggestionButton } from "./ui/SuggestionButton";
 
 export const ChatBotUi = () => {
   const [inputValue, setInputValue] = useState("");
+  const [messages, setMessages] = useState([]);
 
   const suggestions = [
     "What can I ask you to do?",
@@ -13,95 +18,83 @@ export const ChatBotUi = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!inputValue.trim()) return;
-    console.log("Submitted:", inputValue);
+
+    setMessages((prev) => [...prev, { role: "user", text: inputValue }]);
     setInputValue("");
   };
 
+  const chatStarted = messages.length > 0;
+
   return (
-    <div
-      className="
-        w-full h-full 
-        flex flex-col 
-        items-center 
-        justify-between 
-        px-4 py-10
-      "
-    >
-      {/* ÜST KISIM */}
-      <div className="flex flex-col items-center gap-4 mt-10">
-        <img src={star} alt="star" className="w-10 h-10 opacity-80" />
-        <h1 className="text-xl font-medium text-gray-800">
-          Ask our AI anything
-        </h1>
-      </div>
+    <div className="w-full h-screen flex flex-col px-4 py-6 bg-white overflow-hidden relative">
 
-      {/* ÖNERİLER (ORTADA COLUMN) */}
-      <div className="flex flex-col items-center gap-6 grow justify-center">
-        <h2 className="text-sm font-medium text-gray-600">
-          Suggestions on what to ask
-        </h2>
-
-        <div className="flex flex-col gap-3 items-center">
-          {suggestions.map((txt, i) => (
-            <button
-              key={i}
-              onClick={() => setInputValue(txt)}
-              className="
-                w-[260px] h-12
-                flex items-center justify-center
-                bg-white/40 
-                backdrop-blur-xl
-                border border-white/50
-                rounded-2xl
-                shadow-md shadow-black/5
-                text-gray-800
-                hover:bg-white/60
-                transition
-              "
-            >
-              {txt}
-            </button>
-          ))}
+      {/* SMALL STAR TOP-LEFT */}
+      {chatStarted && (
+        <div className="absolute top-4 left-4">
+          <img src={star} alt="star" className="w-5 h-5 opacity-80" />
         </div>
-      </div>
+      )}
 
-      {/* ALT INPUT BAR */}
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-[620px] px-2"
-      >
+      {/* HEADER (visible before chat starts) */}
+      {!chatStarted && (
+        <div className="flex flex-col items-center gap-4 mt-10">
+          <img src={star} alt="star" className="w-10 h-10 opacity-80" />
+          <h1 className="text-xl font-medium text-gray-800">
+            Ask our AI anything
+          </h1>
+        </div>
+      )}
+
+      {/* CHAT BUBBLES */}
+      {chatStarted && (
         <div
           className="
-            w-full 
-            bg-white/60 
-            backdrop-blur-xl 
-            border border-white/50 
-            rounded-2xl 
-            shadow-md shadow-black/5 
-            flex items-center 
-            p-3
+            flex flex-col gap-3 
+            w-full max-w-[620px] 
+            mx-auto 
+            grow
+            overflow-y-auto 
+            scrollbar-none 
+            pt-14 pb-6
           "
         >
-          <input
-            type="text"
-            className="
-              flex-1 bg-transparent
-              text-gray-800
-              placeholder-gray-500
-              text-sm
-              outline-none
-              pr-3
-            "
-            placeholder="Ask me anything..."
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-          />
-
-          <button type="submit" className="p-2 rounded-xl hover:bg-white/40 transition">
-  <SendIcon className="w-6 h-6 text-gray-700 opacity-80 hover:opacity-100" />
-</button>
+          {messages.map((m, i) => (
+            <div
+              key={i}
+              className={`
+                max-w-[75%] px-4 py-2 rounded-2xl text-sm leading-relaxed
+                ${
+                  m.role === "user"
+                    ? "self-end bg-white/70 backdrop-blur-xl border border-gray-300/70 text-gray-900 shadow-md"
+                    : "self-start bg-white/40 backdrop-blur-xl border border-gray-300/50 text-gray-700 shadow-md"
+                }
+              `}
+            >
+              {m.text}
+            </div>
+          ))}
         </div>
-      </form>
+      )}
+
+      {/* SUGGESTIONS (only before chat starts) */}
+      {!chatStarted && (
+        <div className="flex flex-col items-center gap-6 grow justify-center">
+          <SectionTitle>Suggestions on what to ask</SectionTitle>
+
+          <div className="flex flex-col gap-3 items-center">
+            {suggestions.map((txt, i) => (
+              <SuggestionButton key={i} text={txt} onClick={setInputValue} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* INPUT BAR (always visible) */}
+      <InputBar
+        value={inputValue}
+        onChange={setInputValue}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 };
