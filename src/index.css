@@ -1,1 +1,25 @@
 @import "tailwindcss";
+
+/* ----------- Yusuf AI Assistant Soft Scrollbar ----------- */
+
+/* Scrollbar genişliği */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* Scrollbar boş arka plan */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Scrollbar tutma yeri */
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.20);       /* soft dark */
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+/* Hover efekti */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);       /* biraz koyulaşır */
+}

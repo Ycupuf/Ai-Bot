@@ -1,26 +1,79 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import star from "../assets/star.png";
 
-import { SendButton } from "./ui/SendButton";
 import { InputBar } from "./ui/InputBar";
 import { SectionTitle } from "./ui/SectionTitle";
 import { SuggestionButton } from "./ui/SuggestionButton";
 
+// Markdown -> basit HTML çevirici
+function markdownToHtml(md) {
+  return md
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // **bold**
+    .replace(/\*(.*?)\*/g, "<em>$1</em>")             // *italic*
+    .replace(/`(.*?)`/g, "<code>$1</code>")           // `code`
+    .replace(/(?:\r\n|\r|\n)/g, "<br>");              // satır sonu
+}
+
 export const ChatBotUi = () => {
+  const messagesEndRef = useRef(null);
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState([]);
 
   const suggestions = [
-    "What can I ask you to do?",
-    "What projects should I be concerned about right now?",
+    "Tell me about Yusuf's projects.",
+    "Show me Yusuf's coding strengths.",
   ];
 
-  const handleSubmit = (e) => {
+  // Mesaj geldikçe en alta kaydır
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!inputValue.trim()) return;
 
-    setMessages((prev) => [...prev, { role: "user", text: inputValue }]);
+    const userMessage = inputValue;
+
+    // Kullanıcı balonu
+    setMessages((prev) => [...prev, { role: "user", text: userMessage }]);
     setInputValue("");
+
+    // Loading balonu
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", text: "...", loading: true },
+    ]);
+
+    try {
+      const response = await fetch("http://localhost:3001/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userMessage }),
+      });
+
+      const data = await response.json();
+      const aiReply = markdownToHtml(data.reply || "");
+
+      setMessages((prev) => {
+        const withoutLoading = prev.filter((m) => !m.loading);
+        return [...withoutLoading, { role: "assistant", text: aiReply }];
+      });
+    } catch (err) {
+      console.error("Frontend fetch error:", err);
+      setMessages((prev) => {
+        const withoutLoading = prev.filter((m) => !m.loading);
+        return [
+          ...withoutLoading,
+          {
+            role: "assistant",
+            text: "There was a connection problem while talking to the AI.",
+          },
+        ];
+      });
+    }
   };
 
   const chatStarted = messages.length > 0;
@@ -28,24 +81,36 @@ export const ChatBotUi = () => {
   return (
     <div className="w-full h-screen flex flex-col px-4 py-6 bg-white overflow-hidden relative">
 
-      {/* SMALL STAR TOP-LEFT */}
-      {chatStarted && (
-        <div className="absolute top-4 left-4">
-          <img src={star} alt="star" className="w-5 h-5 opacity-80" />
-        </div>
-      )}
+      {/* HEADER – her zaman var, sadece konumu değişiyor */}
+      <div
+        className={`
+          w-full flex flex-col items-center transition-all duration-500 z-20
+          ${
+            chatStarted
+              ? "absolute top-0 left-0 py-3 bg-white/70 backdrop-blur-xl border-b border-gray-300/40"
+              : "mt-10"
+          }
+        `}
+      >
+        <img
+          src={star}
+          alt="star"
+          className={`
+            opacity-80 transition-all duration-500
+            ${chatStarted ? "w-5 h-5" : "w-10 h-10 mb-2"}
+          `}
+        />
+        <h1
+          className={`
+            text-gray-800 transition-all duration-500
+            ${chatStarted ? "text-lg font-semibold" : "text-xl font-medium mt-2"}
+          `}
+        >
+          AI Assistant
+        </h1>
+      </div>
 
-      {/* HEADER (visible before chat starts) */}
-      {!chatStarted && (
-        <div className="flex flex-col items-center gap-4 mt-10">
-          <img src={star} alt="star" className="w-10 h-10 opacity-80" />
-          <h1 className="text-xl font-medium text-gray-800">
-            Ask our AI anything
-          </h1>
-        </div>
-      )}
-
-      {/* CHAT BUBBLES */}
+      {/* CHAT BUBBLES – sohbet başladıktan sonra */}
       {chatStarted && (
         <div
           className="
@@ -54,8 +119,9 @@ export const ChatBotUi = () => {
             mx-auto 
             grow
             overflow-y-auto 
-            scrollbar-none 
-            pt-14 pb-6
+            mt-[90px] pb-6
+            pr-2
+            z-10
           "
         >
           {messages.map((m, i) => (
@@ -68,15 +134,17 @@ export const ChatBotUi = () => {
                     ? "self-end bg-white/70 backdrop-blur-xl border border-gray-300/70 text-gray-900 shadow-md"
                     : "self-start bg-white/40 backdrop-blur-xl border border-gray-300/50 text-gray-700 shadow-md"
                 }
+                ${m.loading ? "animate-pulse" : ""}
               `}
-            >
-              {m.text}
-            </div>
+              dangerouslySetInnerHTML={{ __html: m.text }}
+            />
           ))}
+
+          <div ref={messagesEndRef} />
         </div>
       )}
 
-      {/* SUGGESTIONS (only before chat starts) */}
+      {/* SUGGESTIONS – sadece sohbet başlamadan önce */}
       {!chatStarted && (
         <div className="flex flex-col items-center gap-6 grow justify-center">
           <SectionTitle>Suggestions on what to ask</SectionTitle>
@@ -89,7 +157,7 @@ export const ChatBotUi = () => {
         </div>
       )}
 
-      {/* INPUT BAR (always visible) */}
+      {/* INPUT – her zaman görünür */}
       <InputBar
         value={inputValue}
         onChange={setInputValue}
