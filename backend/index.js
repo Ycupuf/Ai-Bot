@@ -9,6 +9,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Test endpoint to verify environment variables
+app.get('/test-env', (req, res) => {
+  res.json({
+    hasApiKey: !!process.env.OPENAI_API_KEY,
+    keyLength: process.env.OPENAI_API_KEY?.length || 0
+  });
+});
+
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });

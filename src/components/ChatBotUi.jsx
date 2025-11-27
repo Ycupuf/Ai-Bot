@@ -8,10 +8,10 @@ import { SuggestionButton } from "./ui/SuggestionButton";
 // Markdown -> basit HTML çevirici
 function markdownToHtml(md) {
   return md
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // **bold**
-    .replace(/\*(.*?)\*/g, "<em>$1</em>")             // *italic*
-    .replace(/`(.*?)`/g, "<code>$1</code>")           // `code`
-    .replace(/(?:\r\n|\r|\n)/g, "<br>");              // satır sonu
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/g, "<em>$1</em>")
+    .replace(/`(.*?)`/g, "<code>$1</code>")
+    .replace(/(?:\r\n|\r|\n)/g, "<br>");
 }
 
 export const ChatBotUi = () => {
@@ -79,48 +79,33 @@ export const ChatBotUi = () => {
   const chatStarted = messages.length > 0;
 
   return (
-    <div className="w-full h-screen flex flex-col px-4 py-6 bg-white overflow-hidden relative">
+    <div className="w-full h-[100dvh] flex flex-col bg-white relative overflow-hidden">
 
-      {/* HEADER – her zaman var, sadece konumu değişiyor */}
-      <div
-        className={`
-          w-full flex flex-col items-center transition-all duration-500 z-20
-          ${
-            chatStarted
-              ? "absolute top-0 left-0 py-3 bg-white/70 backdrop-blur-xl border-b border-gray-300/40"
-              : "mt-10"
-          }
-        `}
-      >
-        <img
-          src={star}
-          alt="star"
-          className={`
-            opacity-80 transition-all duration-500
-            ${chatStarted ? "w-5 h-5" : "w-10 h-10 mb-2"}
-          `}
-        />
-        <h1
-          className={`
-            text-gray-800 transition-all duration-500
-            ${chatStarted ? "text-lg font-semibold" : "text-xl font-medium mt-2"}
-          `}
-        >
-          AI CV
-        </h1>
+      {/* HEADER – her zaman sabit */}
+      <div className="
+        fixed top-0 left-0 w-full 
+        flex flex-col items-center 
+        py-3
+        bg-white/70 backdrop-blur-xl 
+        border-b border-gray-300/40
+        z-20
+      ">
+        <img src={star} alt="star" className="w-7 h-7 opacity-80" />
+        <h1 className="text-gray-800 text-lg font-semibold mt-1">AI CV</h1>
       </div>
 
-      {/* CHAT BUBBLES – sohbet başladıktan sonra */}
+      {/* CHAT BUBBLES – sadece ortası scroll */}
       {chatStarted && (
         <div
           className="
             flex flex-col gap-3 
             w-full max-w-[620px] 
             mx-auto 
-            grow
+            flex-1
             overflow-y-auto 
-            mt-[90px] pb-6
-            pr-2
+            pt-[90px] 
+            pb-[100px]
+            px-2
             z-10
           "
         >
@@ -144,9 +129,9 @@ export const ChatBotUi = () => {
         </div>
       )}
 
-      {/* SUGGESTIONS – sadece sohbet başlamadan önce */}
+      {/* SUGGESTIONS – sohbet başlamadan önce */}
       {!chatStarted && (
-        <div className="flex flex-col items-center gap-6 grow justify-center">
+        <div className="flex flex-col items-center gap-6 justify-center flex-1 pt-[90px] pb-[100px]">
           <SectionTitle>Suggestions on what to ask</SectionTitle>
 
           <div className="flex flex-col gap-3 items-center">
@@ -157,12 +142,20 @@ export const ChatBotUi = () => {
         </div>
       )}
 
-      {/* INPUT – her zaman görünür */}
-      <InputBar
-        value={inputValue}
-        onChange={setInputValue}
-        onSubmit={handleSubmit}
-      />
+      {/* INPUT – altta sabit */}
+      <div className="
+        fixed bottom-0 left-0 w-full
+        bg-white/80 backdrop-blur-xl 
+        border-t border-gray-300/40
+        px-4 py-3
+        z-20
+      ">
+        <InputBar
+          value={inputValue}
+          onChange={setInputValue}
+          onSubmit={handleSubmit}
+        />
+      </div>
     </div>
   );
 };
