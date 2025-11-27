@@ -106,7 +106,7 @@ export const ChatBotUi = () => {
             ${chatStarted ? "text-lg font-semibold" : "text-xl font-medium mt-2"}
           `}
         >
-          AI Assistant
+          AI CV
         </h1>
       </div>
 
