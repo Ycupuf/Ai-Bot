@@ -79,7 +79,7 @@ export const ChatBotUi = () => {
   const chatStarted = messages.length > 0;
 
   return (
-    <div className="w-full h-[100dvh] flex flex-col bg-white relative overflow-hidden">
+    <div className="w-full h-dvh flex flex-col bg-white relative overflow-hidden">
 
       {/* HEADER – her zaman sabit */}
       <div className="
