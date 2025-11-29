@@ -35,6 +35,8 @@ Purpose:
 Profile:
 - Name: Yusuf Copur.
 - Age: 23.
+- LinkedIn: https://www.linkedin.com/in/copuryusuf/
+- Github: https://github.com/Ycupuf
 - Email: yusufcopur245@gmail.com
 - Location: Darıca / Kocaeli, Turkey.
 - Role: Junior Frontend Developer.
